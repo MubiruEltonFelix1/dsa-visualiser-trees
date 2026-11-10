@@ -1,0 +1,8 @@
+- Tree logic lives in src/lib (bst.ts, general.ts models; traversal.ts algorithms on a shared RNode shape; layout.ts positions); UI only converts models to RNode — keeps one canvas and one animation controller for both tree types.
+- AVL operations (src/lib/avl.ts) return an Operation with immutable tree snapshots (frames); the UI only steps through frames via useStepper — history is never re-derived, so Previous Step always shows true past state.
+- Advanced search trees use shared TreeOperation snapshots and AdvancedLab controls with independent per-mode state; algorithms clone before mutation so history remains exact. Red-Black algorithms use an internal black NIL sentinel and exported snapshots use null leaves with restored parent pointers to avoid shared cyclic sentinel state.
+- Shared RNode rendering metadata carries multi-key cells and Red-Black colors; the existing layout measures multi-key widths so the same canvas supports all tree modes without overlapping nodes.
+- Invariant checks are read-only functions in src/lib/invariants.ts and each lab evaluates its currently rendered snapshot; this keeps statuses and violation outlines synchronized with rewind without altering algorithms.
+- The app is stateless: every tree model lives in React state, so there is no database, no auth, and no server-side persistence. Do not add a backend just to "complete" the stack.
+- Production target is the Nitro `node-server` preset building to `.output/`; `npm start` runs `.output/server/index.mjs`. Changing `nitro.preset` in vite.config.ts is what retargets the build.
+- Branding and shareable metadata live in src/lib/site.ts so titles, canonical URLs and og: tags stay consistent between the root shell and routes.

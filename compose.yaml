@@ -1,0 +1,41 @@
+# Production deployment for the TreeViz / DSA Visualiser app.
+#
+#   cp .env.example .env      # then set VITE_PUBLIC_SITE_URL
+#   docker compose up -d --build
+#   curl http://localhost:3000/api/health
+#
+# The app is stateless: all tree models live in browser memory, so there is no
+# database and no persistent volume to declare. Nothing is lost when the
+# container is recreated.
+
+services:
+  treeviz:
+    build:
+      context: .
+      args:
+        # Baked into the client bundle at build time. Must be your real domain.
+        VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-}
+    image: treeviz:latest
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      NODE_ENV: production
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    # Hardening: the app needs no filesystem writes outside its own image.
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    security_opt:
+      - no-new-privileges:true

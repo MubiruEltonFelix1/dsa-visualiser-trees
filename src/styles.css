@@ -1,0 +1,126 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-node: var(--node);
+  --color-selected: var(--selected);
+  --color-subtree: var(--subtree);
+  --color-heavy-left: var(--heavy-left);
+  --color-heavy-right: var(--heavy-right);
+  --color-edge: var(--edge);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-rb-red: var(--rb-red);
+  --color-rb-black: var(--rb-black);
+  --color-rb-foreground: var(--rb-foreground);
+  --color-rb-outline: var(--rb-outline);
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.17 0.03 260);
+  --foreground: oklch(0.95 0.01 250);
+  --card: oklch(0.21 0.035 260);
+  --card-foreground: oklch(0.95 0.01 250);
+  --popover: oklch(0.23 0.035 260);
+  --popover-foreground: oklch(0.95 0.01 250);
+  --primary: oklch(0.82 0.14 210);
+  --primary-foreground: oklch(0.18 0.03 260);
+  --secondary: oklch(0.27 0.035 260);
+  --secondary-foreground: oklch(0.92 0.01 250);
+  --muted: oklch(0.25 0.03 260);
+  --muted-foreground: oklch(0.76 0.025 255);
+  --accent: oklch(0.3 0.05 240);
+  --accent-foreground: oklch(0.95 0.01 250);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --success: oklch(0.76 0.17 150);
+  --success-foreground: oklch(0.18 0.03 260);
+  --node: oklch(0.24 0.035 260);
+  --selected: oklch(0.82 0.15 80);
+  --subtree: oklch(0.72 0.14 330);
+  --heavy-left: oklch(0.78 0.15 55);
+  --heavy-right: oklch(0.74 0.12 235);
+  --edge: oklch(0.55 0.035 255);
+  --border: oklch(0.32 0.035 258);
+  --input: oklch(0.32 0.035 258);
+  --ring: oklch(0.82 0.14 210);
+  --rb-red: oklch(0.49 0.19 25);
+  --rb-black: oklch(0.08 0 0);
+  --rb-foreground: oklch(0.99 0 0);
+  --rb-outline: oklch(0.65 0.02 255);
+  --glow-primary: 0 0 18px color-mix(in oklab, var(--primary) 60%, transparent);
+  --panel-shadow: 0 4px 16px -12px oklch(0 0 0 / 45%);
+  --canvas-background: oklch(0.15 0.03 260);
+  --canvas-dot: oklch(0.3 0.03 258);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
+}
+
+@utility panel {
+  background: color-mix(in oklab, var(--card) 92%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--panel-shadow);
+}
+
+@utility canvas-grid {
+  background-color: var(--canvas-background);
+  background-image: radial-gradient(circle, var(--canvas-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.tree-node circle, .tree-node text { transition: fill 300ms, stroke 300ms, filter 300ms; }
+.tree-node.current circle { filter: drop-shadow(0 0 10px var(--primary)); }
+
+.tree-node.alert circle { filter: drop-shadow(0 0 8px var(--destructive)); }
+
+.tree-workspace > * { min-width: 0; }
+.tree-workspace p, .tree-workspace dd { overflow-wrap: anywhere; }
+@media (max-width: 1023px) {
+  .tree-workspace > div { grid-row: 1; }
+  .tree-type-tabs { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); order: 3; }
+  .tree-type-tabs > button { height: auto; min-height: 36px; white-space: normal; }
+  .tree-stage { height: 52vh; }
+  header { position: relative !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-node, .tree-node circle, .tree-node rect, .tree-node text { transition: none !important; }
+}
