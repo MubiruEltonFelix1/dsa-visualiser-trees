@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   GitFork,
   Layers,
   ListOrdered,
+  Menu,
   Maximize2,
   Minimize2,
   Network,
@@ -101,6 +102,20 @@ function TreeViz() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [algos, setAlgos] = useState<Record<Mode, Algorithm>>(DEFAULT_ALGO);
   const [speed, setSpeed] = useState(50);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Lock page scroll while the mode menu is open.
+  useEffect(() => {
+    const html = document.documentElement;
+    if (menuOpen) {
+      html.style.overflow = "hidden";
+    } else {
+      html.style.overflow = "";
+    }
+    return () => {
+      html.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   const isLinear =
     mode === "stack" || mode === "queue" || mode === "min-heap" || mode === "max-heap";
@@ -231,24 +246,41 @@ function TreeViz() {
               <p className="text-xs text-muted-foreground">Interactive Data Structure Laboratory</p>
             </div>
           </div>
-          <div
-            role="tablist"
-            aria-label="Tree type"
-            className="tree-type-tabs flex flex-wrap rounded-lg border bg-card p-1"
-          >
-            {tabs.map(([m, label, Icon]) => (
-              <Button
-                variant="ghost"
-                key={m}
-                role="tab"
-                aria-selected={mode === m}
-                onClick={() => setMode(m)}
-                className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label={menuOpen ? "Close mode menu" : "Open mode menu"}
+              aria-expanded={menuOpen}
+            >
+              <Menu className="size-5" />
+            </Button>
+            {menuOpen && (
+              <div
+                role="menu"
+                aria-label="Data structure mode"
+                className="absolute top-full left-0 right-0 mt-2 rounded-xl border bg-card p-3 shadow-2xl z-50"
               >
-                <Icon className="size-4" />
-                {label}
-              </Button>
-            ))}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                  {tabs.map(([m, label, Icon]) => (
+                    <Button
+                      key={m}
+                      role="menuitem"
+                      variant={mode === m ? "default" : "ghost"}
+                      onClick={() => {
+                        setMode(m);
+                        setMenuOpen(false);
+                      }}
+                      className="flex flex-col items-center gap-1 px-2 py-2 text-xs font-medium whitespace-normal"
+                    >
+                      <Icon className="size-5" />
+                      <span>{label}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <Button variant="outline" onClick={resetAll} title="Clear this mode's tree">
             <RefreshCcw /> Reset
