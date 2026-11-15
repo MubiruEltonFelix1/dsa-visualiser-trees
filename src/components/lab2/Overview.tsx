@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Clock, Database, Hash, Sparkles, TrendingUp, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DEFAULT_TERMS } from "@/lib/lab2";
 
@@ -62,27 +63,35 @@ export function Overview() {
               later queries only pay for the range search and the small match sort.
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-4">
-            <div className="flex flex-col gap-3">
-              {steps.map((s, i) => (
-                <div key={s.label} className="flex items-center gap-3">
-                  <div className="flex size-8 items-center justify-center rounded-md border bg-secondary font-mono text-sm font-semibold text-accent-foreground">
-                    {i + 1}
-                  </div>
-                  <s className="flex-1 -mx-2 border-b border-border opacity-40" />
-                  <div className="flex w-16 flex-shrink-0 items-center gap-2 text-sm">
-                    {s.icon && <s.icon className="size-4 opacity-60" />}
-                    <span className="font-medium">{s.label}</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground">{s.desc}</div>
-                  {i < steps.length - 1 && (
-                    <div className="ml-2 flex h-4 size-4 shrink-0 items-center justify-center rounded-sm bg-primary text-primary-foreground text-[10px]">
-                      <ArrowRight className="size-3" />
-                    </div>
+          <CardContent className="pt-4 space-y-4">
+            {steps.map((s, i) => (
+              <div key={s.label} className="flex items-start gap-3">
+                <div
+                  className={cn(
+                    "flex size-8 shrink-0 items-center justify-center rounded-md border font-mono text-xs font-semibold transition-colors",
+                    i === steps.length - 1
+                      ? "border-success text-success bg-success/10"
+                      : "border-border text-muted-foreground bg-secondary",
                   )}
+                >
+                  {i + 1}
                 </div>
-              ))}
-            </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    {s.icon && <s.icon className="size-4 opacity-60" />}
+                    <span className="font-medium text-sm">{s.label}</span>
+                  </div>
+                  <div className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
+                    {s.desc}
+                  </div>
+                </div>
+                {i < steps.length - 1 && (
+                  <div className="w-[1px] flex-1 flex items-center">
+                    <div className="h-full border-l border-border opacity-40" />
+                  </div>
+                )}
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
