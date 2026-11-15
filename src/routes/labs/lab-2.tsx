@@ -3,7 +3,7 @@ import { useState } from "react";
 import { BarChart2, BookOpen, LayoutList, Sliders, TrendingUp, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 import { absoluteUrl } from "@/lib/site";
 import { DEFAULT_TERMS } from "@/lib/lab2";
 import { AdvancedExtension } from "@/components/lab2/AdvancedExtension";
@@ -80,39 +80,46 @@ function Lab2() {
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-0 border border-border rounded-xl bg-background/40 shadow">
-            <Tabs value={selected} onValueChange={setSelected} className="flex w-full flex-col lg:flex-row gap-0">
-              <aside className="flex-none lg:w-64 border-b lg:border-b-0 lg:border-r border-border bg-secondary/40 p-1">
-                <TabsList className="flex flex-col gap-0.5">
-                  {sections.map((s) => (
-                    <TabsTrigger
-                      key={s.value}
-                      value={selected}
-                      className="flex w-full items-center gap-2 rounded-md border-transparent px-2 py-2 text-sm font-medium text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-                    >
-                      {s.icon && <s.icon className="size-4 shrink-0" />}
-                      <span className="truncate">{s.label}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </aside>
-
-              <div className="flex-1 min-w-0 border-t lg:border-t-0 border-l lg:border-l-0 border-border p-4">
+          <div className="flex flex-col lg:flex-row gap-4 min-h-[640px]">
+            {/* Side navigation */}
+            <nav className="flex-none lg:w-64 flex flex-col gap-1 rounded-xl border bg-card p-3 shadow">
+              <div className="px-2 py-2">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                  Sections
+                </h3>
+              </div>
+              <div className="flex flex-col gap-1">
                 {sections.map((s) => (
-                  <TabsContent key={s.value} value={s.value} className="mt-0">
-                    {s.value === "overview" && <Overview />}
-                    {s.value === "terms" && <TermExplorer />}
-                    {s.value === "comparators" && <ComparatorPlayground />}
-                    {s.value === "binary-search" && <BinarySearchVisualizer />}
-                    {s.value === "prefix-range" && <PrefixRangeFinder />}
-                    {s.value === "autocomplete" && <AutocompleteSimulator />}
-                    {s.value === "complexity" && <ComplexityLab />}
-                    {s.value === "practice" && <PracticeCheckpoints />}
-                    {s.value === "advanced" && <AdvancedExtension terms={DEFAULT_TERMS} />}
-                  </TabsContent>
+                  <button
+                    key={s.value}
+                    onClick={() => setSelected(s.value)}
+                    aria-current={selected === s.value ? "page" : undefined}
+                    className={cn(
+                      "flex w-full items-center gap-2 rounded-md border-transparent px-3 py-2 text-sm font-medium text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                      selected === s.value
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    )}
+                  >
+                    {s.icon && <s.icon className="size-4 shrink-0" />}
+                    <span className="truncate">{s.label}</span>
+                  </button>
                 ))}
               </div>
-            </Tabs>
+            </nav>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0 border border-border rounded-xl bg-card p-4 shadow">
+              {selected === "overview" && <Overview />}
+              {selected === "terms" && <TermExplorer />}
+              {selected === "comparators" && <ComparatorPlayground />}
+              {selected === "binary-search" && <BinarySearchVisualizer />}
+              {selected === "prefix-range" && <PrefixRangeFinder />}
+              {selected === "autocomplete" && <AutocompleteSimulator />}
+              {selected === "complexity" && <ComplexityLab />}
+              {selected === "practice" && <PracticeCheckpoints />}
+              {selected === "advanced" && <AdvancedExtension terms={DEFAULT_TERMS} />}
+            </div>
           </div>
         </div>
       </div>
