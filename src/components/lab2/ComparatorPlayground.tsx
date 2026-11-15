@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Sliders, GitCompare, Slice } from "lucide-react";
+import { Sliders, GitCompare, Lightbulb, Slice } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,11 +20,38 @@ import {
 
 type Mode = "lexicographic" | "reverse-weight" | "prefix";
 
-const MODES: { value: Mode; label: string; desc: string }[] = [
-  { value: "lexicographic", label: "Case-insensitive lexicographic", desc: "Compares whole words only; ignores weight." },
-  { value: "reverse-weight", label: "Reverse weight order", desc: "Highest weight first; ignores word." },
-  { value: "prefix", label: "Prefix order", desc: "Compares only the first k characters, case-insensitively." },
+const MODES: { value: Mode; label: string; desc: string; teaches: string }[] = [
+  {
+    value: "lexicographic",
+    label: "Case-insensitive lexicographic",
+    desc: "Compares whole words only; ignores weight.",
+    teaches: "Used to sort the dictionary alphabetically — the one-time order that makes prefixes contiguous.",
+  },
+  {
+    value: "reverse-weight",
+    label: "Reverse weight order",
+    desc: "Highest weight first; ignores word.",
+    teaches: "Used to rank only the matching subset — never the whole dictionary.",
+  },
+  {
+    value: "prefix",
+    label: "Prefix order",
+    desc: "Compares only the first k characters, case-insensitively.",
+    teaches: "Used by binary search to decide whether a term starts with the typed prefix.",
+  },
 ];
+
+function InsightCallout({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-lg border border-accent/50 bg-accent/10 p-4">
+      <div className="flex items-start gap-2 mb-2">
+        <Lightbulb className="size-4 text-accent-foreground shrink-0 mt-0.5" />
+        <span className="text-xs font-semibold text-accent-foreground uppercase tracking-wider">{title}</span>
+      </div>
+      <p className="text-sm text-accent-foreground/90 leading-relaxed">{body}</p>
+    </div>
+  );
+}
 
 export function ComparatorPlayground() {
   const [mode, setMode] = useState<Mode>("lexicographic");
@@ -114,8 +141,8 @@ export function ComparatorPlayground() {
               Comparator Playground
             </CardTitle>
             <CardDescription>
-              Pick how terms are ordered, sort the list, then compare any two terms to see the
-              comparator's result.
+              A comparator decides how any two terms are ordered. The same list looks completely
+              different under each comparator — and each mode has a specific job in autocomplete.
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
@@ -135,11 +162,17 @@ export function ComparatorPlayground() {
                   ))}
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{modeInfo?.desc}</p>
+                <p className="mt-1 text-xs text-muted-foreground italic">
+                  Teaches: {modeInfo?.teaches}
+                </p>
               </div>
               {mode === "prefix" ? (
                 <div className="space-y-2 flex h-full items-end">
                   <Label htmlFor="cmp-k">k (prefix length)</Label>
                   <Input id="cmp-k" type="number" value={k} onChange={(e) => setK(Math.max(1, Number(e.target.value) || 1))} className="w-16" />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Only the first k characters are compared — so {"apple" < "k" ? "apply" : "apply"} and {"apricot" < "k" ? "apply" : "apricot"} tie at k = 2.
+                  </p>
                 </div>
               ) : null}
               <div className="space-y-2 flex h-full items-end">
@@ -253,8 +286,8 @@ export function ComparatorPlayground() {
               Equality is relative to the comparator
             </CardTitle>
             <CardDescription>
-              Under prefix order with k = 2, "Kampala" and "Kansas" compare equal because both begin
-              with "Ka". That is correct and expected — they occupy the same prefix bucket.
+              Two different words can compare as equal under one comparator but not another. That is
+              not a bug — it is the point of having different comparators for different jobs.
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
@@ -267,15 +300,27 @@ export function ComparatorPlayground() {
                 <li>Switch to "Case-insensitive lexicographic": they no longer compare equal.</li>
               </ul>
             </div>
+            <InsightCallout
+              title="Why equality is relative"
+              body={
+                "Under prefix order with k = 2, \"Kampala\" and \"Kansas\" both begin with \"Ka\", so " +
+                "they compare equal — they occupy the same prefix bucket. Binary search uses this to " +
+                "treat every term starting with \"Ka\" as a match for the prefix \"Ka\". Switch to " +
+                "lexicographic order and they differ again, because full words are compared."
+              }
+            />
             <div className="mt-4 grid gap-2 sm:grid-cols-3">
               <div className="rounded-lg border bg-secondary/50 p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Never compare weights inside lexicographic order.</div>
+                <div className="text-xs font-semibold text-muted-foreground">Lexicographic:</div>
+                <div className="text-[10px] text-muted-foreground">Compares whole words. Ignores weight.</div>
               </div>
               <div className="rounded-lg border bg-secondary/50 p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Never compare words inside reverse-weight order.</div>
+                <div className="text-xs font-semibold text-muted-foreground">Reverse weight:</div>
+                <div className="text-[10px] text-muted-foreground">Compares weights only. Ignores words.</div>
               </div>
               <div className="rounded-lg border bg-secondary/50 p-3">
-                <div className="text-xs font-semibold text-muted-foreground">Prefix comparator: same first k chars ⇒ equal.</div>
+                <div className="text-xs font-semibold text-muted-foreground">Prefix:</div>
+                <div className="text-[10px] text-muted-foreground">Same first k chars ⇒ equal.</div>
               </div>
             </div>
           </CardContent>

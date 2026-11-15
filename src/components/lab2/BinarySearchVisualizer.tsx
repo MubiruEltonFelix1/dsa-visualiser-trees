@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Play, Pause, SkipBack, SkipForward, RotateCcw, TrendingUp } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, TrendingUp, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useStepper } from "@/hooks/use-stepper";
 import { Button } from "@/components/ui/button";
@@ -34,13 +34,32 @@ const MODE_LABELS: Record<Mode, string> = {
   last: "lastIndexOf — rightmost match",
 };
 
-const INVARIANTS: Record<Mode, string> = {
-  ordinary: "Stop at the first match found; report its index.",
+const MODE_TEACHES: Record<Mode, string> = {
+  ordinary:
+    "Stops at the first match it finds. Fine for finding one element, but not enough to find the full prefix range.",
   first:
-    "The first matching index is still somewhere in the unresolved left portion — or it is the saved answer.",
+    "Keeps searching left after a match to find the leftmost occurrence. This is the left boundary of a prefix range.",
   last:
-    "The last matching index is still somewhere in the unresolved right portion — or it is the saved answer.",
+    "Keeps searching right after a match to find the rightmost occurrence. This is the right boundary of a prefix range.",
 };
+
+const WHY_HALF_DISCARD = [
+  "Because the dictionary is sorted alphabetically, if the middle term is below the key, every term to its left is also below — discard the whole left half.",
+  "If the middle term is above the key, every term to its right is above — discard the whole right half.",
+  "Each comparison throws away half the remaining interval, so the search needs only O(log N) steps.",
+];
+
+function InsightCallout({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-lg border border-accent/50 bg-accent/10 p-4">
+      <div className="flex items-start gap-2 mb-2">
+        <Lightbulb className="size-4 text-accent-foreground shrink-0 mt-0.5" />
+        <span className="text-xs font-semibold text-accent-foreground uppercase tracking-wider">{title}</span>
+      </div>
+      <p className="text-sm text-accent-foreground/90 leading-relaxed">{body}</p>
+    </div>
+  );
+}
 
 export function BinarySearchVisualizer() {
   const [mode, setMode] = useState<Mode>("first");
@@ -62,7 +81,6 @@ export function BinarySearchVisualizer() {
   });
 
   const frame = trace.frames[stepper.step];
-  const lastFrame = trace.frames[trace.frames.length - 1];
 
   const goToFinal = () => {
     stepper.goto(trace.frames.length - 1);
@@ -119,6 +137,9 @@ export function BinarySearchVisualizer() {
                     lastIndexOf
                   </Button>
                 </div>
+                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                  {MODE_TEACHES[mode]}
+                </p>
               </div>
               <div className="space-y-2 flex h-full items-end">
                 <label className="text-xs font-semibold text-muted-foreground">Search key</label>
@@ -262,7 +283,9 @@ export function BinarySearchVisualizer() {
               <Separator orientation="vertical" className="h-4" />
               Step information
             </CardTitle>
-            <CardDescription>The real comparator result and region decision at this step.</CardDescription>
+            <CardDescription>
+              The real comparator result and region decision at this step.
+            </CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
             <div className="grid grid-cols-2 gap-4">
@@ -280,7 +303,9 @@ export function BinarySearchVisualizer() {
               </div>
               <div className="space-y-1">
                 <span className="text-xs text-muted-foreground">Search key</span>
-                <div className="font-mono text-lg font-semibold">"{frame ? frame.key : key}"</div>
+                <div className="font-mono text-lg font-semibold">
+                  "{frame ? frame.key : key}"
+                </div>
               </div>
               <div className="space-y-1">
                 <span className="text-xs text-muted-foreground">Comparator result</span>
@@ -310,19 +335,16 @@ export function BinarySearchVisualizer() {
 
             <div className="mt-4 rounded-lg border bg-secondary/40 p-3">
               <div className="text-xs font-semibold text-muted-foreground mb-1">Loop invariant</div>
-              <div className="text-sm">{INVARIANTS[mode]}</div>
+              <div className="text-sm">{frame ? (() => {
+                if (frame.cmp === 0 && mode === "first") return "Match saved; continuing left to find an earlier one.";
+                if (frame.cmp === 0 && mode === "last") return "Match saved; continuing right to find a later one.";
+                if (frame.cmp === 0 && mode === "ordinary") return "Match found — ordinary search stops here.";
+                if (frame.cmp !== null) return frame.cmp < 0 ? "mid is below the key — discard the left half." : "mid is above the key — discard the right half.";
+                return "Search beginning.";
+              })() : "Search beginning."}</div>
               <div className="mt-2 text-sm text-muted-foreground">
-                {frame && frame.cmp === 0 && mode === "first"
-                  ? "Match saved; continuing left to find an earlier one."
-                  : frame && frame.cmp === 0 && mode === "last"
-                  ? "Match saved; continuing right to find a later one."
-                  : frame && frame.cmp === 0
-                  ? "Match found — ordinary search stops here."
-                  : frame && frame.cmp !== null
-                  ? frame.cmp < 0
-                    ? "mid is below the key — discard the left half."
-                    : "mid is above the key — discard the right half."
-                  : "Search beginning."}
+                The invariant is what makes the algorithm correct: at every step, the true answer is
+                either still inside the unresolved interval or already saved.
               </div>
             </div>
 
@@ -332,7 +354,7 @@ export function BinarySearchVisualizer() {
                   <span className="text-success font-semibold">Result:</span>
                   {MODE_LABELS[mode]} found index{" "}
                   <span className="font-mono font-semibold">{frame.answer}</span>{" "}
-                  ({terms[frame.answer]?.word}). {mode !== "ordinary" && "The search did not stop at the first match — it kept narrowing until the boundary was certain."}
+                  ({terms[frame.answer]?.word}).{mode !== "ordinary" && " The search did not stop at the first match — it kept narrowing until the boundary was certain."}
                 </div>
               </div>
             )}
@@ -349,7 +371,9 @@ export function BinarySearchVisualizer() {
               <Separator orientation="vertical" className="h-4" />
               Why binary search works here
             </CardTitle>
-            <CardDescription>The dictionary must be sorted alphabetically for the half-discard to be valid.</CardDescription>
+            <CardDescription>
+              Half-discard is only valid because the dictionary is sorted alphabetically.
+            </CardDescription>
           </CardHeader>
           <CardContent className="pt-4 space-y-3">
             <div className="space-y-2">
@@ -363,20 +387,19 @@ export function BinarySearchVisualizer() {
               </div>
             </div>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>
-                Because the list is sorted, if the middle term is below the key, every term to its
-                left is also below — the whole left half can be discarded.
-              </li>
-              <li>
-                If the middle term is above the key, every term to its right is above — discard the
-                right half.
-              </li>
-              <li>
-                Ordinary search stops at the first match. firstIndexOf and lastIndexOf keep going
-                past a match to pin down the exact boundary — that is what makes prefix ranges
-                possible.
-              </li>
+              {WHY_HALF_DISCARD.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
             </ul>
+            <InsightCallout
+              title="Why we need two searches for prefixes"
+              body={
+                "Ordinary search stops at the first match. But several terms can share a prefix, so " +
+                "the first match is not necessarily the leftmost — and it certainly is not the " +
+                "rightmost. firstIndexOf finds the left edge of the matching block; lastIndexOf finds " +
+                "the right edge. Together they give the exact contiguous range of matches."
+              }
+            />
           </CardContent>
         </Card>
       </div>
