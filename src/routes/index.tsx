@@ -272,6 +272,34 @@ function TreeViz() {
             >
               <Menu className="size-5" />
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="hidden sm:inline-block">
+                  Labs
+                  <ChevronDown className="size-4 shrink-0 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[220px]">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Labs</DropdownMenuLabel>
+                  <DropdownMenuItem asChild>
+                    <Link to="/labs/lab-2" className="w-full">
+                      Lab 2: Autocomplete
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem disabled>
+                    Lab 1 — Coming soon
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                    Lab 3 — Coming soon
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled>
+                    Lab 4 — Coming soon
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" onClick={resetAll} title="Clear this mode's tree">
               <RefreshCcw className="size-4 shrink-0" />
               <span className="hidden sm:inline">Reset</span>
@@ -327,29 +355,40 @@ function TreeViz() {
                 </Button>
               ))}
             </div>
-            <div className="mt-4 border-t border-border pt-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full justify-between text-sm">
-                    Labs
-                    <ChevronDown className="size-4 shrink-0" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[220px]">
-                  <DropdownMenuGroup>
-                    <DropdownMenuLabel>Labs</DropdownMenuLabel>
-                    <DropdownMenuItem asChild>
-                      <Link to="/labs/lab-2" onClick={() => setMenuOpen(false)} className="w-full">
-                        Lab 2: Autocomplete
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem disabled>Lab 1 — Coming soon</DropdownMenuItem>
-                    <DropdownMenuItem disabled>Lab 3 — Coming soon</DropdownMenuItem>
-                    <DropdownMenuItem disabled>Lab 4 — Coming soon</DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="mt-4 border-t border-border pt-4">
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                Labs
+              </h3>
+              <div className="flex flex-col gap-1">
+                <Link
+                  to="/labs/lab-2"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex w-full justify-between items-center gap-2 rounded-md border bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 text-left"
+                >
+                  Lab 2: Autocomplete
+                </Link>
+                <Button
+                  variant="ghost"
+                  disabled
+                  className="w-full justify-between text-sm text-left text-muted-foreground"
+                >
+                  Lab 1 — Coming soon
+                </Button>
+                <Button
+                  variant="ghost"
+                  disabled
+                  className="w-full justify-between text-sm text-left text-muted-foreground"
+                >
+                  Lab 3 — Coming soon
+                </Button>
+                <Button
+                  variant="ghost"
+                  disabled
+                  className="w-full justify-between text-sm text-left text-muted-foreground"
+                >
+                  Lab 4 — Coming soon
+                </Button>
+              </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
               Pick a structure to visualize. Your other modes stay intact when you switch.
