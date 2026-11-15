@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -13,8 +13,18 @@ import {
   Scale,
   TreePine,
   X,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/sonner";
 import { TreeCanvas } from "@/components/treeviz/TreeCanvas";
 import { BstControls } from "@/components/treeviz/BstControls";
@@ -241,7 +251,7 @@ function TreeViz() {
       <Toaster theme="dark" position="top-center" richColors />
       <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1">
             <div className="rounded-lg border bg-card p-2 text-primary">
               <TreePine className="size-5" />
             </div>
@@ -252,7 +262,7 @@ function TreeViz() {
               <p className="text-xs text-muted-foreground">Interactive Data Structure Laboratory</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             <Button
               variant="outline"
               size="icon"
@@ -316,6 +326,30 @@ function TreeViz() {
                   {mode === m && <span className="text-xs text-primary font-medium">Active</span>}
                 </Button>
               ))}
+            </div>
+            <div className="mt-4 border-t border-border pt-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between text-sm">
+                    Labs
+                    <ChevronDown className="size-4 shrink-0" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-[220px]">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Labs</DropdownMenuLabel>
+                    <DropdownMenuItem asChild>
+                      <Link to="/labs/lab-2" onClick={() => setMenuOpen(false)} className="w-full">
+                        Lab 2: Autocomplete
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem disabled>Lab 1 — Coming soon</DropdownMenuItem>
+                    <DropdownMenuItem disabled>Lab 3 — Coming soon</DropdownMenuItem>
+                    <DropdownMenuItem disabled>Lab 4 — Coming soon</DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
               Pick a structure to visualize. Your other modes stay intact when you switch.
