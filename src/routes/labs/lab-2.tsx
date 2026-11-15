@@ -97,23 +97,23 @@ function Lab2() {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-4">
-            <aside className="flex-none lg:w-64 space-y-1">
-              <TabsList className="flex flex-col gap-1">
-                {sections.map((s) => (
-                  <TabsTrigger
-                    key={s.value}
-                    value={selected}
-                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-left"
-                  >
-                    {s.icon && <s.icon className="size-4" />}
-                    {s.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </aside>
+            <Tabs value={selected} onValueChange={setSelected} className="flex-1 min-w-0 flex flex-col lg:flex-row gap-4">
+              <aside className="flex-none lg:w-64 space-y-1">
+                <TabsList className="flex flex-col gap-1">
+                  {sections.map((s) => (
+                    <TabsTrigger
+                      key={s.value}
+                      value={selected}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-left"
+                    >
+                      {s.icon && <s.icon className="size-4" />}
+                      {s.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </aside>
 
-            <div className="flex-1 min-w-0">
-              <Tabs value={selected} onValueChange={setSelected}>
+              <div className="flex-1 min-w-0">
                 {sections.map((s) => (
                   <TabsContent key={s.value} value={s.value} className="mt-4">
                     {s.value === "overview" && <Overview />}
@@ -127,8 +127,8 @@ function Lab2() {
                     {s.value === "advanced" && <AdvancedExtension terms={DEFAULT_TERMS} />}
                   </TabsContent>
                 ))}
-              </Tabs>
-            </div>
+              </div>
+            </Tabs>
           </div>
         </div>
       </div>
