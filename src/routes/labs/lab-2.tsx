@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { BarChart2, BookOpen, Home, LayoutList, Sliders, TrendingUp, Zap } from "lucide-react";
+import { BarChart2, BookOpen, LayoutList, Sliders, TrendingUp, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +15,7 @@ import { Overview } from "@/components/lab2/Overview";
 import { PracticeCheckpoints } from "@/components/lab2/PracticeCheckpoints";
 import { PrefixRangeFinder } from "@/components/lab2/PrefixRangeFinder";
 import { TermExplorer } from "@/components/lab2/TermExplorer";
+import { Navbar } from "@/components/lab2/Navbar";
 
 const sections = [
   { value: "overview", label: "Overview", icon: BookOpen },
@@ -58,33 +59,16 @@ function Lab2() {
 
   return (
     <div className="min-h-screen">
-      <div className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur px-4 py-3">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 rounded-lg border bg-card p-2 text-primary"
-              title="Return to TreeViz home"
-            >
-              <Home className="size-5" />
-            </Link>
-            <div>
-              <h1 className="text-lg leading-tight font-bold">
-                Tree<span className="text-primary">Viz</span>
-              </h1>
-              <p className="text-xs text-muted-foreground">Interactive Data Structure Laboratory</p>
-            </div>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
+        <Navbar
+          extraActions={
             <Link
               to="/"
               className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Back to home
             </Link>
-          </div>
-        </div>
-      </div>
+          }
+        />
 
       <div className="mx-auto max-w-[1600px] px-4 py-6">
         <div className="flex flex-col gap-4">
