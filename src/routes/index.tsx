@@ -12,6 +12,7 @@ import {
   RefreshCcw,
   Scale,
   TreePine,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
@@ -104,7 +105,7 @@ function TreeViz() {
   const [speed, setSpeed] = useState(50);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Lock page scroll while the mode menu is open.
+  // Lock page scroll and close on Escape while the mode menu is open.
   useEffect(() => {
     const html = document.documentElement;
     if (menuOpen) {
@@ -112,7 +113,12 @@ function TreeViz() {
     } else {
       html.style.overflow = "";
     }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && menuOpen) setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
     return () => {
+      window.removeEventListener("keydown", onKey);
       html.style.overflow = "";
     };
   }, [menuOpen]);
@@ -246,7 +252,7 @@ function TreeViz() {
               <p className="text-xs text-muted-foreground">Interactive Data Structure Laboratory</p>
             </div>
           </div>
-          <div className="relative">
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="icon"
@@ -256,37 +262,67 @@ function TreeViz() {
             >
               <Menu className="size-5" />
             </Button>
-            {menuOpen && (
-              <div
-                role="menu"
-                aria-label="Data structure mode"
-                className="absolute top-full left-0 right-0 mt-2 rounded-xl border bg-card p-3 shadow-2xl z-50"
-              >
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                  {tabs.map(([m, label, Icon]) => (
-                    <Button
-                      key={m}
-                      role="menuitem"
-                      variant={mode === m ? "default" : "ghost"}
-                      onClick={() => {
-                        setMode(m);
-                        setMenuOpen(false);
-                      }}
-                      className="flex flex-col items-center gap-1 px-2 py-2 text-xs font-medium whitespace-normal"
-                    >
-                      <Icon className="size-5" />
-                      <span>{label}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
+            <Button variant="outline" onClick={resetAll} title="Clear this mode's tree">
+              <RefreshCcw className="size-4 shrink-0" />
+              <span className="hidden sm:inline">Reset</span>
+            </Button>
           </div>
-          <Button variant="outline" onClick={resetAll} title="Clear this mode's tree">
-            <RefreshCcw /> Reset
-          </Button>
         </div>
       </header>
+
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          onClick={() => setMenuOpen(false)}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <div
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div
+            role="menu"
+            aria-label="Choose a data structure mode"
+            className="relative w-full max-w-md rounded-2xl border bg-card p-6 shadow-2xl z-10 flex flex-col gap-4"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-foreground">Mode</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close mode menu"
+              >
+                <X className="size-4" />
+              </Button>
+            </div>
+            <div className="grid gap-2">
+              {tabs.map(([m, label, Icon]) => (
+                <Button
+                  key={m}
+                  role="menuitem"
+                  variant={mode === m ? "default" : "ghost"}
+                  onClick={() => {
+                    setMode(m);
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className="size-4" />
+                    <span>{label}</span>
+                  </div>
+                  {mode === m && <span className="text-xs text-primary font-medium">Active</span>}
+                </Button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Pick a structure to visualize. Your other modes stay intact when you switch.
+            </p>
+          </div>
+        </div>
+      )}
 
       {mode === "two-three" ? (
         <AdvancedLab
