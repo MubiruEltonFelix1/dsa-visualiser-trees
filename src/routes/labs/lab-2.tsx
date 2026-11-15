@@ -80,26 +80,26 @@ function Lab2() {
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-4">
-            <Tabs value={selected} onValueChange={setSelected} className="flex-1 min-w-0 flex flex-col lg:flex-row gap-4">
-              <aside className="flex-none lg:w-64 space-y-1">
-                <TabsList className="flex flex-col gap-1">
+          <div className="flex flex-col lg:flex-row gap-0 border border-border rounded-xl bg-background/40 shadow">
+            <Tabs value={selected} onValueChange={setSelected} className="flex w-full flex-col lg:flex-row gap-0">
+              <aside className="flex-none lg:w-64 border-b lg:border-b-0 lg:border-r border-border bg-secondary/40 p-1">
+                <TabsList className="flex flex-col gap-0.5">
                   {sections.map((s) => (
                     <TabsTrigger
                       key={s.value}
                       value={selected}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-left"
+                      className="flex w-full items-center gap-2 rounded-md border-transparent px-2 py-2 text-sm font-medium text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
                     >
-                      {s.icon && <s.icon className="size-4" />}
-                      {s.label}
+                      {s.icon && <s.icon className="size-4 shrink-0" />}
+                      <span className="truncate">{s.label}</span>
                     </TabsTrigger>
                   ))}
                 </TabsList>
               </aside>
 
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 border-t lg:border-t-0 border-l lg:border-l-0 border-border p-4">
                 {sections.map((s) => (
-                  <TabsContent key={s.value} value={s.value} className="mt-4">
+                  <TabsContent key={s.value} value={s.value} className="mt-0">
                     {s.value === "overview" && <Overview />}
                     {s.value === "terms" && <TermExplorer />}
                     {s.value === "comparators" && <ComparatorPlayground />}
